@@ -8,7 +8,7 @@
         this.byteLength = byteLength || buffer.byteLength;
 
         this.byteArray = new Uint8Array(buffer);
-        this.dataView = new DataView(buffer, byteOffset, byteLength);
+        // this.dataView = new DataView(buffer, byteOffset, byteLength);
 
         this.initCacheArray();
     };
