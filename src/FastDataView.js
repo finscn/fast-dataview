@@ -77,12 +77,14 @@
     };
 
     FastDataView.prototype.getUint32 = function(offset) {
-        // var a = this.byteArray[offset];
-        // var b = this.byteArray[offset + 1];
-        // var c = this.byteArray[offset + 2];
-        // var d = this.byteArray[offset + 3];
-        // return (a << 24) | (b << 16) | (c << 8) | d;
-        return this.dataView.getUint32(offset);
+        // return this.dataView.getUint32(offset);
+        var a = this.byteArray[offset];
+        var b = this.byteArray[offset + 1];
+        var c = this.byteArray[offset + 2];
+        var d = this.byteArray[offset + 3];
+        var value = (a << 24) | (b << 16) | (c << 8) | d;
+        value = (value >>> 1) * 2 + (d & 1);
+        return value;
     };
 
     FastDataView.prototype.setInt32 = function(offset, value) {
