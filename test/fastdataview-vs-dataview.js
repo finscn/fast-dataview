@@ -1,18 +1,18 @@
 var FastDataView = require("../src/FastDataView");
 
-var bufferSize = 100 * 26;
 var testCount = 10000;
 
+var bufferSize = 26 * 100;
 
-function testWrite(fast) {
-    var buffer = new ArrayBuffer(bufferSize);
+function testWrite(byteLength, fast) {
+    var buffer = new ArrayBuffer(byteLength);
     var DataViewClass = fast ? FastDataView : DataView;
     var name = fast ? 'FastDataView' : 'DataView';
 
-    console.time(name + ' wirte: ');
+    console.time(name + ' wirte');
     for (var c = 0; c < testCount; c++) {
         var view = new DataViewClass(buffer);
-        for (var i = 0; i < bufferSize;) {
+        for (var i = 0; i < byteLength;) {
             view.setUint8(i, 255);
             i += 1;
             view.setInt8(i, 127);
@@ -31,23 +31,19 @@ function testWrite(fast) {
             i += 8;
         }
     }
-    console.timeEnd(name + ' wirte: ');
+    console.timeEnd(name + ' wirte');
+    return buffer;
 }
 
-function testRead(fast) {
-    var buffer = new ArrayBuffer(bufferSize);
-    var arr = new Uint8Array(buffer);
-    for (var i = 0; i < arr.byteLength; i++) {
-        arr[i] = i + 1;
-    }
-
+function testRead(buffer, fast) {
+    var byteLength = buffer.byteLength;
     var DataViewClass = fast ? FastDataView : DataView;
     var name = fast ? 'FastDataView' : 'DataView';
 
-    console.time(name + ' read: ');
+    console.time(name + ' read');
     for (var c = 0; c < testCount; c++) {
         var view = new DataViewClass(buffer);
-        for (var i = 0; i < bufferSize;) {
+        for (var i = 0; i < byteLength;) {
             view.getUint8(i);
             i += 1;
             view.getInt8(i);
@@ -66,69 +62,29 @@ function testRead(fast) {
             i += 8;
         }
     }
-    console.timeEnd(name + ' read: ');
+    console.timeEnd(name + ' read');
+    return buffer;
 }
 
-function verify() {
-    var size = 26;
-    var buffer1 = new ArrayBuffer(size);
-    var view = new DataView(buffer1);
-    for (var i = 0; i < size;) {
-        view.setUint8(i, 255);
-        i += 1;
-        view.setInt8(i, 127);
-        i += 1;
-        view.setUint16(i, 65535);
-        i += 2;
-        view.setInt16(i, 32767);
-        i += 2;
-        view.setUint32(i, 4294967295);
-        i += 4;
-        view.setInt32(i, 2147483647);
-        i += 4;
-        view.setFloat32(i, 3.1415926);
-        i += 4;
-        view.setFloat64(i, Math.E);
-        i += 8;
-    }
-
-    var buffer2 = new ArrayBuffer(size);
-    var view = new FastDataView(buffer2);
-    for (var i = 0; i < size;) {
-        view.setUint8(i, 255);
-        i += 1;
-        view.setInt8(i, 127);
-        i += 1;
-        view.setUint16(i, 65535);
-        i += 2;
-        view.setInt16(i, 32767);
-        i += 2;
-        view.setUint32(i, 4294967295);
-        i += 4;
-        view.setInt32(i, 2147483647);
-        i += 4;
-        view.setFloat32(i, 3.1415926);
-        i += 4;
-        view.setFloat64(i, Math.E);
-        i += 8;
-    }
+function verify(buffer1, buffer2) {
+    var byteLength = buffer1.byteLength;
 
     var bytes1 = new Uint8Array(buffer1);
     var bytes2 = new Uint8Array(buffer2);
 
-    for (var i = 0; i < size; i++) {
+    for (var i = 0; i < byteLength; i++) {
         if (bytes1[i] !== bytes2[i]) {
             console.log("wirte FAILED");
             return;
         }
     }
-    console.log("wirte OK");
+    console.log("wirte OK.");
 
 
     var view1 = new DataView(buffer1);
     var view2 = new FastDataView(buffer2);
 
-    for (var i = 0; i < size;) {
+    for (var i = 0; i < byteLength;) {
         if (view1.getUint8(i) !== view2.getUint8(i)) {
             console.log("read FAILED ", i);
             return;
@@ -171,13 +127,13 @@ function verify() {
         i += 8;
     }
 
-    console.log("read OK");
+    console.log("read OK.");
 
 }
 
 
-testWrite();
-testRead();
-testWrite(true);
-testRead(true);
-verify();
+var buffer1 = testWrite(bufferSize);
+testRead(buffer1);
+var buffer2 = testWrite(bufferSize, true);
+testRead(buffer2, true);
+verify(buffer1, buffer2);
