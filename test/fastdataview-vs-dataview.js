@@ -9,8 +9,8 @@ function testWrite(byteLength, fast) {
     var DataViewClass = fast ? FastDataView : DataView;
     var name = fast ? 'FastDataView' : 'DataView';
 
-    console.time(name + ' wirte');
     var view = new DataViewClass(buffer);
+    console.time(name + ' wirte');
     for (var c = 0; c < testCount; c++) {
         for (var i = 0; i < byteLength;) {
             view.setUint8(i, 255);
@@ -40,8 +40,8 @@ function testRead(buffer, fast) {
     var DataViewClass = fast ? FastDataView : DataView;
     var name = fast ? 'FastDataView' : 'DataView';
 
-    console.time(name + ' read');
     var view = new DataViewClass(buffer);
+    console.time(name + ' read');
     for (var c = 0; c < testCount; c++) {
         for (var i = 0; i < byteLength;) {
             view.getUint8(i);
@@ -79,7 +79,6 @@ function verify(buffer1, buffer2) {
         }
     }
     console.log("wirte OK.");
-
 
     var view1 = new DataView(buffer1);
     var view2 = new FastDataView(buffer2);
