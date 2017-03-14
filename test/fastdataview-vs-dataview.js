@@ -2,7 +2,7 @@ var FastDataView = require("../src/FastDataView");
 
 var testCount = 1000;
 
-var bufferSize = 26 * 100;
+var bufferSize = 26 * 1000;
 
 function testWrite(byteLength, fast) {
     var buffer = new ArrayBuffer(byteLength);
