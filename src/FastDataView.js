@@ -19,10 +19,10 @@
         this.uint8Array = new Uint8Array(this.cacheBuffer);
         this.int8Array = new Int8Array(this.cacheBuffer);
 
-        this.uint16Array = new Uint16Array(this.cacheBuffer);
+        // this.uint16Array = new Uint16Array(this.cacheBuffer);
         this.int16Array = new Int16Array(this.cacheBuffer);
 
-        this.uint32Array = new Uint32Array(this.cacheBuffer);
+        // this.uint32Array = new Uint32Array(this.cacheBuffer);
         this.int32Array = new Int32Array(this.cacheBuffer);
 
         this.float32Array = new Float32Array(this.cacheBuffer);
