@@ -1,6 +1,6 @@
 var FastDataView = require("../src/FastDataView");
 
-var testCount = 10000;
+var testCount = 1000;
 
 var bufferSize = 26 * 100;
 
@@ -80,8 +80,8 @@ function verify(buffer1, buffer2) {
     }
     console.log("wirte OK.");
 
-    var view1 = new DataView(buffer1);
-    var view2 = new FastDataView(buffer2);
+    var view1 = new FastDataView(buffer1);
+    var view2 = new DataView(buffer1);
 
     for (var i = 0; i < byteLength;) {
         if (view1.getUint8(i) !== view2.getUint8(i)) {
@@ -131,8 +131,10 @@ function verify(buffer1, buffer2) {
 }
 
 
-var buffer1 = testWrite(bufferSize);
-testRead(buffer1);
-var buffer2 = testWrite(bufferSize, true);
-testRead(buffer2, true);
+var buffer1 = testWrite(bufferSize, true);
+testRead(buffer1, true);
+
+var buffer2 = testWrite(bufferSize);
+testRead(buffer2);
+
 verify(buffer1, buffer2);
