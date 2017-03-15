@@ -26,7 +26,7 @@ function testWrite(byteLength, fast) {
             i += 4;
             view.setInt32(i, 2147483647);
             i += 4;
-            view.setFloat32(i, 3.1415926);
+            view.setFloat32(i, 1.625);
             i += 4;
             view.setFloat64(i, Math.E);
             i += 8;
@@ -76,7 +76,8 @@ function toArrayBuffer(buf) {
 }
 
 function verify(buffer1, buffer2) {
-    var byteLength = buffer1.byteLength;
+    // var byteLength = buffer1.byteLength;
+    var byteLength = 26;
 
     var bytes1 = buffer1;
     var bytes2 = buffer2;
@@ -87,7 +88,7 @@ function verify(buffer1, buffer2) {
             return;
         }
     }
-    console.log("wirte OK.");
+    console.log("==== wirte OK. ====");
 
     var view1 = new FastDataView(buffer1);
     var view2 = new BufferDataView(buffer2);
@@ -97,45 +98,53 @@ function verify(buffer1, buffer2) {
             console.log("read FAILED ", i);
             return;
         };
+        console.log(view1.getUint8(i));
         i += 1;
         if (view1.getInt8(i) !== view2.getInt8(i)) {
             console.log("read FAILED ", i);
             return;
         };
+        console.log(view1.getInt8(i));
         i += 1;
         if (view1.getUint16(i) !== view2.getUint16(i)) {
             console.log("read FAILED ", i);
             return;
         };
+        console.log(view1.getUint16(i));
         i += 2;
         if (view1.getInt16(i) !== view2.getInt16(i)) {
             console.log("read FAILED ", i);
             return;
         };
+        console.log(view1.getInt16(i));
         i += 2;
         if (view1.getUint32(i) !== view2.getUint32(i)) {
             console.log("read FAILED ", i);
             return;
         };
+        console.log(view1.getUint32(i));
         i += 4;
         if (view1.getInt32(i) !== view2.getInt32(i)) {
             console.log("read FAILED ", i);
             return;
         };
+        console.log(view1.getInt32(i));
         i += 4;
         if (view1.getFloat32(i) !== view2.getFloat32(i)) {
             console.log("read FAILED ", i);
             return;
         };
+        console.log(view1.getFloat32(i));
         i += 4;
         if (view1.getFloat64(i) !== view2.getFloat64(i)) {
             console.log("read FAILED ", i);
             return;
         };
+        console.log(view1.getFloat64(i));
         i += 8;
     }
 
-    console.log("read OK.");
+    console.log("==== read OK. ====");
 
 }
 
