@@ -1,13 +1,13 @@
-var FastDataView = require("../src/FastDataView");
+var BufferDataView = require("../src/BufferDataView");
 
 var testCount = 1000;
 
 var bufferSize = 26 * 1000;
 
 function testWrite(byteLength, fast) {
-    var buffer = new ArrayBuffer(byteLength);
-    var DataViewClass = fast ? FastDataView : DataView;
-    var name = fast ? 'FastDataView' : 'DataView';
+    var buffer = fast ? Buffer.alloc(byteLength) : new ArrayBuffer(byteLength);
+    var DataViewClass = fast ? BufferDataView : DataView;
+    var name = fast ? 'BufferDataView' : 'DataView';
 
     var view = new DataViewClass(buffer);
     console.time(name + ' wirte');
@@ -37,8 +37,8 @@ function testWrite(byteLength, fast) {
 
 function testRead(buffer, fast) {
     var byteLength = buffer.byteLength;
-    var DataViewClass = fast ? FastDataView : DataView;
-    var name = fast ? 'FastDataView' : 'DataView';
+    var DataViewClass = fast ? BufferDataView : DataView;
+    var name = fast ? 'BufferDataView' : 'DataView';
 
     var view = new DataViewClass(buffer);
     console.time(name + ' read');
@@ -66,10 +66,18 @@ function testRead(buffer, fast) {
     return buffer;
 }
 
+function toArrayBuffer(buf) {
+    if (buf.byteOffset === 0 && buf.byteLength === buf.buffer.byteLength) {
+        return buf.buffer;
+    }
+
+    return buf.buffer.slice(buf.byteOffset, buf.byteOffset + buf.byteLength);
+}
+
 function verify(buffer1, buffer2) {
     var byteLength = buffer1.byteLength;
 
-    var bytes1 = new Uint8Array(buffer1);
+    var bytes1 = new Uint8Array(toArrayBuffer(buffer1));
     var bytes2 = new Uint8Array(buffer2);
 
     for (var i = 0; i < byteLength; i++) {
@@ -80,8 +88,8 @@ function verify(buffer1, buffer2) {
     }
     console.log("wirte OK.");
 
-    var view1 = new FastDataView(buffer1);
-    var view2 = new DataView(buffer1);
+    var view1 = new BufferDataView(buffer1);
+    var view2 = new DataView(buffer2);
 
     for (var i = 0; i < byteLength;) {
         if (view1.getUint8(i) !== view2.getUint8(i)) {
