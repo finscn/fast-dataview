@@ -17,7 +17,7 @@
         this.byteOffset = byteOffset || 0;
         this.byteLength = byteLength || buffer.byteLength;
 
-        // if buffer is an instanceof Node Buffer , byteArray = buffer;
+        // if buffer is an instance of Node Buffer , byteArray = buffer;
         this.byteArray = buffer.buffer ? buffer : new Uint8Array(buffer);
 
         this.initCacheArray();
