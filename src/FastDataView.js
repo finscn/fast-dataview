@@ -87,9 +87,7 @@
         var b = this.byteArray[offset + 1];
         var c = this.byteArray[offset + 2];
         var d = this.byteArray[offset + 3];
-        var value = (a << 24) | (b << 16) | (c << 8) | d;
-        value = (value >>> 1) * 2 + (d & 1);
-        return value;
+        return ((a << 24) >>> 0) + ((b << 16) | (c << 8) | (d));
     };
 
     FastDataView.prototype.setInt32 = function(offset, value) {
