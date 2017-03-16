@@ -3,12 +3,12 @@ var BufferDataView = require("../src/BufferDataView");
 
 var testCount = 1000;
 
-var bufferSize = 26 * 1000;
+var bufferSize = 26 * 1024;
 
 function testWrite(byteLength, fast) {
     var buffer = Buffer.alloc(byteLength);
     var DataViewClass = fast ? FastDataView : BufferDataView;
-    var name = fast ? 'FastDataView' : 'DataView';
+    var name = fast ? 'FastDataView' : 'BufferDataView';
 
     var view = new DataViewClass(buffer);
     console.time(name + ' wirte');
@@ -39,7 +39,7 @@ function testWrite(byteLength, fast) {
 function testRead(buffer, fast) {
     var byteLength = buffer.byteLength;
     var DataViewClass = fast ? FastDataView : BufferDataView;
-    var name = fast ? 'FastDataView' : 'DataView';
+    var name = fast ? 'FastDataView' : 'BufferDataView';
 
     var view = new DataViewClass(buffer);
     console.time(name + ' read');
@@ -148,6 +148,7 @@ function verify(buffer1, buffer2) {
 
 }
 
+console.log("==== performance (x" + testCount + ") ====");
 
 var buffer1 = testWrite(bufferSize, true);
 testRead(buffer1, true);

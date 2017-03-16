@@ -2,7 +2,7 @@ var BufferDataView = require("../src/BufferDataView");
 
 var testCount = 1000;
 
-var bufferSize = 26 * 1000;
+var bufferSize = 26 * 1024;
 
 function testWrite(byteLength, fast) {
     var buffer = fast ? Buffer.alloc(byteLength) : new ArrayBuffer(byteLength);
@@ -147,6 +147,7 @@ function verify(buffer1, buffer2) {
 
 }
 
+console.log("==== performance (x" + testCount + ") ====");
 
 var buffer1 = testWrite(bufferSize, true);
 testRead(buffer1, true);
