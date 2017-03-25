@@ -17,7 +17,7 @@
         this.byteOffset = byteOffset || 0;
         this.byteLength = byteLength || buffer.byteLength;
 
-        // if buffer is an instance of Node Buffer , byteArray = buffer;
+        // If buffer is an instance of Node Buffer , byteArray = buffer;
         this.byteArray = buffer.buffer ? buffer : new Uint8Array(buffer);
 
         this.initCacheArray();
@@ -47,6 +47,7 @@
     };
 
     FastDataView.prototype.getInt8 = function(offset) {
+        // Use TypedArray
         this.uint8Array[0] = this.byteArray[offset];
         return this.int8Array[0];
     };
@@ -68,13 +69,13 @@
     };
 
     FastDataView.prototype.getInt16 = function(offset) {
+        // Use TypedArray
         this.uint8Array[0] = this.byteArray[offset + 1];
         this.uint8Array[1] = this.byteArray[offset];
         return this.int16Array[0];
     };
 
     FastDataView.prototype.setUint32 = function(offset, value) {
-        // this.dataView.setUint32(offset, value);
         this.byteArray[offset] = value >>> 24;
         this.byteArray[offset + 1] = (value >>> 16);
         this.byteArray[offset + 2] = (value >>> 8);
@@ -82,7 +83,6 @@
     };
 
     FastDataView.prototype.getUint32 = function(offset) {
-        // return this.dataView.getUint32(offset);
         var a = this.byteArray[offset];
         var b = this.byteArray[offset + 1];
         var c = this.byteArray[offset + 2];
@@ -98,6 +98,7 @@
     };
 
     FastDataView.prototype.getInt32 = function(offset) {
+        // Use TypedArray
         this.uint8Array[0] = this.byteArray[offset + 3];
         this.uint8Array[1] = this.byteArray[offset + 2];
         this.uint8Array[2] = this.byteArray[offset + 1];
@@ -114,6 +115,7 @@
     };
 
     FastDataView.prototype.getFloat32 = function(offset) {
+        // Use TypedArray
         this.uint8Array[0] = this.byteArray[offset + 3];
         this.uint8Array[1] = this.byteArray[offset + 2];
         this.uint8Array[2] = this.byteArray[offset + 1];
@@ -134,6 +136,7 @@
     };
 
     FastDataView.prototype.getFloat64 = function(offset) {
+        // Use TypedArray
         this.uint8Array[0] = this.byteArray[offset + 7];
         this.uint8Array[1] = this.byteArray[offset + 6];
         this.uint8Array[2] = this.byteArray[offset + 5];
