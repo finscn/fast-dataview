@@ -1,5 +1,5 @@
 {
-  "name": "fast-dataview",
+  "name": "fast-dataview.js",
   "version": "0.0.1",
   "description": "A fast DataView implementation in javascript, and could works with Node.js Buffers.",
   "main": "src/FastDataView.js",
