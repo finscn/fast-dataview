@@ -1,5 +1,5 @@
 # FastDataView.js
-A fast DataView in javascript
+A fast DataView implementation in javascript, and could works with Node.js Buffers.
 
 
 ### Why FastDataView is fast
