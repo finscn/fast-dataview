@@ -1,6 +1,6 @@
 {
-  "name": "fast-dataview.js",
-  "version": "0.0.1",
+  "name": "fast-dataview",
+  "version": "0.0.2",
   "description": "A fast DataView implementation in javascript, and could works with Node.js Buffers.",
   "main": "src/FastDataView.js",
   "scripts": {
@@ -8,7 +8,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git@github.com:finscn/FastDataView.js.git"
+    "url": "git@github.com:finscn/fast-dataview.git"
   },
   "keywords": [
     "dataview",
