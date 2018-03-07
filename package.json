@@ -10,17 +10,16 @@
     "type": "git",
     "url": "git@github.com:finscn/fast-dataview.git"
   },
+  "author": {
+    "name": "finscn",
+    "email": "finscn@gmail.com"
+  },
+  "license": "MIT",
   "keywords": [
     "dataview",
     "data",
     "view",
     "node",
     "buffer"
-  ],
-  "author": {
-    "name": "finscn",
-    "email": "finscn@gmail.com",
-    "url": "fattyboy.cn"
-  },
-  "license": "MIT"
+  ]
 }
