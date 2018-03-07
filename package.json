@@ -8,12 +8,9 @@
   },
   "repository": {
     "type": "git",
-    "url": "git@github.com:finscn/fast-dataview.git"
+    "url": "git+ssh://git@github.com/finscn/fast-dataview.git"
   },
-  "author": {
-    "name": "finscn",
-    "email": "finscn@gmail.com"
-  },
+  "author": "finscn <finscn@gmail.com>",
   "license": "MIT",
   "keywords": [
     "dataview",
@@ -21,5 +18,12 @@
     "view",
     "node",
     "buffer"
-  ]
+  ],
+  "bugs": {
+    "url": "https://github.com/finscn/fast-dataview/issues"
+  },
+  "homepage": "https://github.com/finscn/fast-dataview#readme",
+  "directories": {
+    "test": "test"
+  }
 }
