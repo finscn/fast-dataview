@@ -1,6 +1,6 @@
 {
-  "name": "fast-dataview.js",
-  "version": "0.0.1",
+  "name": "fast-dataview",
+  "version": "0.0.2",
   "description": "A fast DataView implementation in javascript, and could works with Node.js Buffers.",
   "main": "src/FastDataView.js",
   "scripts": {
@@ -20,7 +20,7 @@
   "author": {
     "name": "finscn",
     "email": "finscn@gmail.com",
-    "url": "fattyboy.cn"
+    "url": "fatidol.com"
   },
   "license": "MIT"
 }
