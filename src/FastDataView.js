@@ -13,14 +13,8 @@
     var float64Array = new Float64Array(cacheBuffer);
 
     var FastDataView = function(buffer, byteOffset, byteLength) {
-        this.buffer = buffer;
-        this.byteOffset = byteOffset || 0;
-        this.byteLength = byteLength || buffer.byteLength;
-
-        // If buffer is an instance of Node Buffer , byteArray = buffer;
-        this.byteArray = buffer.buffer ? buffer : new Uint8Array(buffer);
-
         this.initCacheArray();
+        this.setBuffer(buffer, byteOffset, byteLength);
     };
 
     FastDataView.prototype.initCacheArray = function() {
@@ -33,6 +27,15 @@
         this.float32Array = float32Array;
         this.float64Array = float64Array;
     };
+
+    FastDataView.prototype.setBuffer = function(buffer, byteOffset, byteLength) {
+        this.buffer = buffer;
+        this.byteOffset = byteOffset || 0;
+        this.byteLength = byteLength || buffer.byteLength;
+
+        // If buffer is an instance of Node Buffer , byteArray = buffer;
+        this.byteArray = buffer.buffer ? buffer : new Uint8Array(buffer);
+    }
 
     FastDataView.prototype.setUint8 = function(offset, value) {
         this.byteArray[offset] = value;
