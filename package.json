@@ -8,8 +8,10 @@
   },
   "repository": {
     "type": "git",
-    "url": "git@github.com:finscn/FastDataView.js.git"
+    "url": "git+ssh://git@github.com/finscn/fast-dataview.git"
   },
+  "author": "finscn <finscn@gmail.com>",
+  "license": "MIT",
   "keywords": [
     "dataview",
     "data",
@@ -22,5 +24,11 @@
     "email": "finscn@gmail.com",
     "url": "fatidol.com"
   },
-  "license": "MIT"
+  "bugs": {
+    "url": "https://github.com/finscn/fast-dataview/issues"
+  },
+  "homepage": "https://github.com/finscn/fast-dataview#readme",
+  "directories": {
+    "test": "test"
+  }
 }
