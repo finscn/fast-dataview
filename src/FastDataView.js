@@ -61,6 +61,10 @@ var FastDataView;
         return this.byteArray[offset];
     };
 
+    FastDataView.prototype.pushUint8 = function(value) {
+        this.byteArray[this.cursor++] = value;
+    };
+
     FastDataView.prototype.nextUint8 = function() {
         return this.byteArray[this.cursor++];
     };
@@ -73,6 +77,10 @@ var FastDataView;
         // Use TypedArray
         this.uint8Array[0] = this.byteArray[offset];
         return this.int8Array[0];
+    };
+
+    FastDataView.prototype.pushInt8 = function(value) {
+        this.byteArray[this.cursor++] = value;
     };
 
     FastDataView.prototype.nextInt8 = function() {
@@ -90,6 +98,13 @@ var FastDataView;
         var a = this.byteArray[offset];
         var b = this.byteArray[offset + 1];
         return (a << 8) | b;
+    };
+
+    FastDataView.prototype.pushUint16 = function(value) {
+        var offset = this.cursor;
+        this.byteArray[offset] = value >>> 8;
+        this.byteArray[offset + 1] = value;
+        this.cursor += 2;
     };
 
     FastDataView.prototype.nextUint16 = function() {
@@ -110,6 +125,13 @@ var FastDataView;
         this.uint8Array[0] = this.byteArray[offset + 1];
         this.uint8Array[1] = this.byteArray[offset];
         return this.int16Array[0];
+    };
+
+    FastDataView.prototype.pushInt16 = function(value) {
+        var offset = this.cursor;
+        this.byteArray[offset] = value >>> 8;
+        this.byteArray[offset + 1] = value;
+        this.cursor += 2;
     };
 
     FastDataView.prototype.nextInt16 = function() {
@@ -134,6 +156,15 @@ var FastDataView;
         var c = this.byteArray[offset + 2];
         var d = this.byteArray[offset + 3];
         return ((a << 24) >>> 0) + ((b << 16) | (c << 8) | (d));
+    };
+
+    FastDataView.prototype.pushUint32 = function(value) {
+        var offset = this.cursor;
+        this.byteArray[offset] = value >>> 24;
+        this.byteArray[offset + 1] = (value >>> 16);
+        this.byteArray[offset + 2] = (value >>> 8);
+        this.byteArray[offset + 3] = value;
+        this.cursor += 4;
     };
 
     FastDataView.prototype.nextUint32 = function() {
@@ -162,6 +193,15 @@ var FastDataView;
         return this.int32Array[0];
     };
 
+    FastDataView.prototype.pushInt32 = function(value) {
+        var offset = this.cursor;
+        this.byteArray[offset] = value >>> 24;
+        this.byteArray[offset + 1] = (value >>> 16);
+        this.byteArray[offset + 2] = (value >>> 8);
+        this.byteArray[offset + 3] = value;
+        this.cursor += 4;
+    };
+
     FastDataView.prototype.nextInt32 = function() {
         // Use TypedArray
         var offset = this.cursor;
@@ -188,6 +228,16 @@ var FastDataView;
         this.uint8Array[2] = this.byteArray[offset + 1];
         this.uint8Array[3] = this.byteArray[offset];
         return this.float32Array[0];
+    };
+
+    FastDataView.prototype.pushFloat32 = function(value) {
+        var offset = this.cursor;
+        this.float32Array[0] = value;
+        this.byteArray[offset] = this.uint8Array[3];
+        this.byteArray[offset + 1] = this.uint8Array[2];
+        this.byteArray[offset + 2] = this.uint8Array[1];
+        this.byteArray[offset + 3] = this.uint8Array[0];
+        this.cursor += 4;
     };
 
     FastDataView.prototype.nextFloat32 = function() {
@@ -224,6 +274,20 @@ var FastDataView;
         this.uint8Array[6] = this.byteArray[offset + 1];
         this.uint8Array[7] = this.byteArray[offset];
         return this.float64Array[0];
+    };
+
+    FastDataView.prototype.pushFloat64 = function(value) {
+        var offset = this.cursor;
+        this.float64Array[0] = value;
+        this.byteArray[offset] = this.uint8Array[7];
+        this.byteArray[offset + 1] = this.uint8Array[6];
+        this.byteArray[offset + 2] = this.uint8Array[5];
+        this.byteArray[offset + 3] = this.uint8Array[4];
+        this.byteArray[offset + 4] = this.uint8Array[3];
+        this.byteArray[offset + 5] = this.uint8Array[2];
+        this.byteArray[offset + 6] = this.uint8Array[1];
+        this.byteArray[offset + 7] = this.uint8Array[0];
+        this.cursor += 8;
     };
 
     FastDataView.prototype.nextFloat64 = function() {
