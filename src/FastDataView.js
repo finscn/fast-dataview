@@ -1,5 +1,7 @@
 "use strict";
 
+var FastDataView;
+
 (function(exports) {
 
     var cacheBuffer = new ArrayBuffer(8);
@@ -12,7 +14,7 @@
     var float32Array = new Float32Array(cacheBuffer);
     var float64Array = new Float64Array(cacheBuffer);
 
-    var FastDataView = function(buffer, byteOffset, byteLength) {
+    FastDataView = function(buffer, byteOffset, byteLength) {
         this.initCacheArray();
         this.setBuffer(buffer, byteOffset, byteLength);
     };
@@ -35,7 +37,13 @@
 
         // If buffer is an instance of Node Buffer , byteArray = buffer;
         this.byteArray = buffer.buffer ? buffer : new Uint8Array(buffer);
-    }
+
+        this.cursor = this.byteOffset;
+    };
+
+    FastDataView.prototype.slice = function(begin, end) {
+        return this.byteArray.slice(begin, end);
+    };
 
     FastDataView.prototype.setUint8 = function(offset, value) {
         this.byteArray[offset] = value;
@@ -43,6 +51,10 @@
 
     FastDataView.prototype.getUint8 = function(offset) {
         return this.byteArray[offset];
+    };
+
+    FastDataView.prototype.nextUint8 = function() {
+        return this.byteArray[this.cursor++];
     };
 
     FastDataView.prototype.setInt8 = function(offset, value) {
@@ -55,6 +67,12 @@
         return this.int8Array[0];
     };
 
+    FastDataView.prototype.nextInt8 = function() {
+        // Use TypedArray
+        this.uint8Array[0] = this.byteArray[this.cursor++];
+        return this.int8Array[0];
+    };
+
     FastDataView.prototype.setUint16 = function(offset, value) {
         this.byteArray[offset] = value >>> 8;
         this.byteArray[offset + 1] = value;
@@ -63,6 +81,14 @@
     FastDataView.prototype.getUint16 = function(offset) {
         var a = this.byteArray[offset];
         var b = this.byteArray[offset + 1];
+        return (a << 8) | b;
+    };
+
+    FastDataView.prototype.nextUint16 = function() {
+        var offset = this.cursor;
+        var a = this.byteArray[offset];
+        var b = this.byteArray[offset + 1];
+        this.cursor += 2;
         return (a << 8) | b;
     };
 
@@ -78,6 +104,15 @@
         return this.int16Array[0];
     };
 
+    FastDataView.prototype.nextInt16 = function() {
+        // Use TypedArray
+        var offset = this.cursor;
+        this.uint8Array[0] = this.byteArray[offset + 1];
+        this.uint8Array[1] = this.byteArray[offset];
+        this.cursor += 2;
+        return this.int16Array[0];
+    };
+
     FastDataView.prototype.setUint32 = function(offset, value) {
         this.byteArray[offset] = value >>> 24;
         this.byteArray[offset + 1] = (value >>> 16);
@@ -90,6 +125,16 @@
         var b = this.byteArray[offset + 1];
         var c = this.byteArray[offset + 2];
         var d = this.byteArray[offset + 3];
+        return ((a << 24) >>> 0) + ((b << 16) | (c << 8) | (d));
+    };
+
+    FastDataView.prototype.nextUint32 = function() {
+        var offset = this.cursor;
+        var a = this.byteArray[offset];
+        var b = this.byteArray[offset + 1];
+        var c = this.byteArray[offset + 2];
+        var d = this.byteArray[offset + 3];
+        this.cursor += 4;
         return ((a << 24) >>> 0) + ((b << 16) | (c << 8) | (d));
     };
 
@@ -109,6 +154,17 @@
         return this.int32Array[0];
     };
 
+    FastDataView.prototype.nextInt32 = function() {
+        // Use TypedArray
+        var offset = this.cursor;
+        this.uint8Array[0] = this.byteArray[offset + 3];
+        this.uint8Array[1] = this.byteArray[offset + 2];
+        this.uint8Array[2] = this.byteArray[offset + 1];
+        this.uint8Array[3] = this.byteArray[offset];
+        this.cursor += 4;
+        return this.int32Array[0];
+    };
+
     FastDataView.prototype.setFloat32 = function(offset, value) {
         this.float32Array[0] = value;
         this.byteArray[offset] = this.uint8Array[3];
@@ -123,6 +179,17 @@
         this.uint8Array[1] = this.byteArray[offset + 2];
         this.uint8Array[2] = this.byteArray[offset + 1];
         this.uint8Array[3] = this.byteArray[offset];
+        return this.float32Array[0];
+    };
+
+    FastDataView.prototype.nextFloat32 = function() {
+        // Use TypedArray
+        var offset = this.cursor;
+        this.uint8Array[0] = this.byteArray[offset + 3];
+        this.uint8Array[1] = this.byteArray[offset + 2];
+        this.uint8Array[2] = this.byteArray[offset + 1];
+        this.uint8Array[3] = this.byteArray[offset];
+        this.cursor += 4;
         return this.float32Array[0];
     };
 
@@ -151,11 +218,26 @@
         return this.float64Array[0];
     };
 
+    FastDataView.prototype.nextFloat64 = function() {
+        // Use TypedArray
+        var offset = this.cursor;
+        this.uint8Array[0] = this.byteArray[offset + 7];
+        this.uint8Array[1] = this.byteArray[offset + 6];
+        this.uint8Array[2] = this.byteArray[offset + 5];
+        this.uint8Array[3] = this.byteArray[offset + 4];
+        this.uint8Array[4] = this.byteArray[offset + 3];
+        this.uint8Array[5] = this.byteArray[offset + 2];
+        this.uint8Array[6] = this.byteArray[offset + 1];
+        this.uint8Array[7] = this.byteArray[offset];
+        this.cursor += 8;
+        return this.float64Array[0];
+    };
+
     if (exports) {
         exports.FastDataView = FastDataView;
     }
 
-    if (typeof module != "undefined") {
+    if (typeof module !== "undefined") {
         module.exports = FastDataView;
     }
 
