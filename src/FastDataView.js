@@ -16,7 +16,15 @@ var FastDataView;
 
     FastDataView = function(buffer, byteOffset, byteLength) {
         this.initCacheArray();
-        this.setBuffer(buffer, byteOffset, byteLength);
+        if (buffer) {
+            this.setBuffer(buffer, byteOffset, byteLength);
+        } else {
+            this.buffer = null;
+            this.byteOffset = 0;
+            this.byteLength = 0;
+            this.byteArray = null;
+            this.cursor = 0;
+        }
     };
 
     FastDataView.prototype.initCacheArray = function() {
