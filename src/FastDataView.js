@@ -40,29 +40,33 @@ var FastDataView;
 
     FastDataView.prototype.setBuffer = function(buffer, byteOffset, byteLength) {
         this.buffer = buffer;
+        // If buffer is an instance of Node Buffer , byteArray = buffer;
+        this.byteArray = buffer.buffer ? buffer : new Uint8Array(buffer);
 
-        var bufferSize = buffer.byteLength;
+        this.setRange(byteOffset, byteLength);
+    };
+
+    FastDataView.prototype.setRange = function(byteOffset, byteLength) {
+        var bufferSize = this.buffer.byteLength;
         this.byteOffset = Math.min(bufferSize, byteOffset || 0);
 
         var maxLength = bufferSize - this.byteOffset;
         this.byteLength = Math.min(maxLength, byteLength || maxLength);
 
-        // If buffer is an instance of Node Buffer , byteArray = buffer;
-        this.byteArray = buffer.buffer ? buffer : new Uint8Array(buffer);
-
+        this.byteEnd = this.byteOffset + this.byteLength;
         this.cursor = 0;
     };
 
     FastDataView.prototype.slice = function(begin, end) {
-        return this.byteArray.slice(begin + this.byteOffset, end + this.byteOffset);
+        return this.byteArray.slice(begin + this.byteOffset, Math.min(this.byteEnd, end + this.byteOffset));
     };
 
     FastDataView.prototype.getRest = function() {
-        return this.byteArray.slice(this.cursor + this.byteOffset, this.byteLength + this.byteOffset);
+        return this.byteArray.slice(this.cursor + this.byteOffset, this.byteEnd);
     };
 
     FastDataView.prototype.skip = function(count) {
-        this.cursor += count;
+        this.cursor = Math.min(this.byteEnd, this.cursor + count);
     };
 
     FastDataView.prototype.setUint8 = function(offset, value) {
@@ -328,6 +332,8 @@ var FastDataView;
         this.cursor += 8;
         return this.float64Array[0];
     };
+
+    FastDataView.version = '0.1.6';
 
     if (exports) {
         exports.FastDataView = FastDataView;

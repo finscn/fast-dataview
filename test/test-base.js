@@ -18,3 +18,6 @@ for (var i = 0; i < 10; i++) {
 console.log('======== viewPart.getRest ========')
 var b = viewPart.getRest();
 console.log(b.join(', '));
+
+var t = view.byteArray.slice(2,2);
+console.log(t.length)
