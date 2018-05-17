@@ -1,7 +1,10 @@
 var FastDataView = require("../src/FastDataView");
 
 var byteLength = 64;
-var buffer = new ArrayBuffer(byteLength);
+
+// var buffer = new ArrayBuffer(byteLength);
+var buffer = new Buffer(byteLength);
+
 var view = new FastDataView(buffer);
 for (var i = 0; i < byteLength; i++) {
     view.setUint8(i, i);

@@ -57,12 +57,12 @@ var FastDataView;
         this.cursor = 0;
     };
 
-    FastDataView.prototype.slice = function(begin, end) {
-        return this.byteArray.slice(begin + this.byteOffset, Math.min(this.byteEnd, end + this.byteOffset));
+    FastDataView.prototype.subarray = function(begin, end) {
+        return this.byteArray.subarray(begin + this.byteOffset, Math.min(this.byteEnd, end + this.byteOffset));
     };
 
     FastDataView.prototype.getRest = function() {
-        return this.byteArray.slice(this.cursor + this.byteOffset, this.byteEnd);
+        return this.byteArray.subarray(this.cursor + this.byteOffset, this.byteEnd);
     };
 
     FastDataView.prototype.skip = function(count) {
@@ -333,7 +333,7 @@ var FastDataView;
         return this.float64Array[0];
     };
 
-    FastDataView.version = '0.1.6';
+    FastDataView.version = '0.1.7';
 
     if (exports) {
         exports.FastDataView = FastDataView;
