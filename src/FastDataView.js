@@ -50,19 +50,19 @@ var FastDataView;
     };
 
     FastDataView.prototype.slice = function(begin, end) {
-        return this.byteArray.slice(begin, end);
+        return this.byteArray.slice(begin + this.byteOffset, end + this.byteOffset);
     };
 
     FastDataView.prototype.getRest = function() {
-        return this.byteArray.slice(this.cursor);
+        return this.byteArray.slice(this.cursor, this.byteLength);
     };
 
     FastDataView.prototype.setUint8 = function(offset, value) {
-        this.byteArray[offset] = value;
+        this.byteArray[offset + this.byteOffset] = value;
     };
 
     FastDataView.prototype.getUint8 = function(offset) {
-        return this.byteArray[offset];
+        return this.byteArray[offset + this.byteOffset];
     };
 
     FastDataView.prototype.pushUint8 = function(value) {
@@ -74,12 +74,12 @@ var FastDataView;
     };
 
     FastDataView.prototype.setInt8 = function(offset, value) {
-        this.byteArray[offset] = value;
+        this.byteArray[offset + this.byteOffset] = value;
     };
 
     FastDataView.prototype.getInt8 = function(offset) {
         // Use TypedArray
-        this.uint8Array[0] = this.byteArray[offset];
+        this.uint8Array[0] = this.byteArray[offset + this.byteOffset];
         return this.int8Array[0];
     };
 
@@ -94,11 +94,13 @@ var FastDataView;
     };
 
     FastDataView.prototype.setUint16 = function(offset, value) {
+        offset += this.byteOffset;
         this.byteArray[offset] = value >>> 8;
         this.byteArray[offset + 1] = value;
     };
 
     FastDataView.prototype.getUint16 = function(offset) {
+        offset += this.byteOffset;
         var a = this.byteArray[offset];
         var b = this.byteArray[offset + 1];
         return (a << 8) | b;
@@ -120,12 +122,14 @@ var FastDataView;
     };
 
     FastDataView.prototype.setInt16 = function(offset, value) {
+        offset += this.byteOffset;
         this.byteArray[offset] = value >>> 8;
         this.byteArray[offset + 1] = value;
     };
 
     FastDataView.prototype.getInt16 = function(offset) {
         // Use TypedArray
+        offset += this.byteOffset;
         this.uint8Array[0] = this.byteArray[offset + 1];
         this.uint8Array[1] = this.byteArray[offset];
         return this.int16Array[0];
@@ -148,6 +152,7 @@ var FastDataView;
     };
 
     FastDataView.prototype.setUint32 = function(offset, value) {
+        offset += this.byteOffset;
         this.byteArray[offset] = value >>> 24;
         this.byteArray[offset + 1] = (value >>> 16);
         this.byteArray[offset + 2] = (value >>> 8);
@@ -155,6 +160,7 @@ var FastDataView;
     };
 
     FastDataView.prototype.getUint32 = function(offset) {
+        offset += this.byteOffset;
         var a = this.byteArray[offset];
         var b = this.byteArray[offset + 1];
         var c = this.byteArray[offset + 2];
@@ -182,6 +188,7 @@ var FastDataView;
     };
 
     FastDataView.prototype.setInt32 = function(offset, value) {
+        offset += this.byteOffset;
         this.byteArray[offset] = value >>> 24;
         this.byteArray[offset + 1] = (value >>> 16);
         this.byteArray[offset + 2] = (value >>> 8);
@@ -190,6 +197,7 @@ var FastDataView;
 
     FastDataView.prototype.getInt32 = function(offset) {
         // Use TypedArray
+        offset += this.byteOffset;
         this.uint8Array[0] = this.byteArray[offset + 3];
         this.uint8Array[1] = this.byteArray[offset + 2];
         this.uint8Array[2] = this.byteArray[offset + 1];
@@ -218,6 +226,7 @@ var FastDataView;
     };
 
     FastDataView.prototype.setFloat32 = function(offset, value) {
+        offset += this.byteOffset;
         this.float32Array[0] = value;
         this.byteArray[offset] = this.uint8Array[3];
         this.byteArray[offset + 1] = this.uint8Array[2];
@@ -227,6 +236,7 @@ var FastDataView;
 
     FastDataView.prototype.getFloat32 = function(offset) {
         // Use TypedArray
+        offset += this.byteOffset;
         this.uint8Array[0] = this.byteArray[offset + 3];
         this.uint8Array[1] = this.byteArray[offset + 2];
         this.uint8Array[2] = this.byteArray[offset + 1];
@@ -256,6 +266,7 @@ var FastDataView;
     };
 
     FastDataView.prototype.setFloat64 = function(offset, value) {
+        offset += this.byteOffset;
         this.float64Array[0] = value;
         this.byteArray[offset] = this.uint8Array[7];
         this.byteArray[offset + 1] = this.uint8Array[6];
@@ -268,6 +279,7 @@ var FastDataView;
     };
 
     FastDataView.prototype.getFloat64 = function(offset) {
+        offset += this.byteOffset;
         // Use TypedArray
         this.uint8Array[0] = this.byteArray[offset + 7];
         this.uint8Array[1] = this.byteArray[offset + 6];
