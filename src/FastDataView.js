@@ -53,6 +53,10 @@ var FastDataView;
         return this.byteArray.slice(begin, end);
     };
 
+    FastDataView.prototype.getRest = function() {
+        return this.byteArray.slice(this.cursor);
+    };
+
     FastDataView.prototype.setUint8 = function(offset, value) {
         this.byteArray[offset] = value;
     };
