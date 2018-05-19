@@ -333,7 +333,7 @@ var FastDataView;
         return this.float64Array[0];
     };
 
-    FastDataView.version = '0.1.7';
+    FastDataView.version = '0.1.8';
 
     if (exports) {
         exports.FastDataView = FastDataView;
