@@ -1,41 +1,91 @@
-var FastDataView = require("../src/FastDataView");
+var FastDataView = FastDataView || require("../src/FastDataView");
 
 var testCount = 1000;
 
 var bufferSize = 26 * 1024;
 
-function testWrite(byteLength, fast) {
-    var buffer = new ArrayBuffer(byteLength);
+var littleEndian = false;
+
+var args = process.argv.slice(2);
+if (args[0] === 'little' || args[0] === 'l') {
+    littleEndian = true;
+    console.log('\n ALL TESTS USE : littleEndian \n');
+} else {
+    console.log('\n ALL TESTS USE : bigEndian \n');
+}
+
+var types = [
+    'Uint8',
+    'Int8',
+    'Uint16',
+    'Int16',
+    'Uint32',
+    'Int32',
+    'Float32',
+    'Float64',
+];
+
+function saveTestDataToView(view, littleEndian) {
+    var byteLength = view.byteLength;
+    for (var i = 0; i < byteLength;) {
+        view.setUint8(i, 255, littleEndian);
+        i += 1;
+        view.setInt8(i, 127, littleEndian);
+        i += 1;
+        view.setUint16(i, 65535, littleEndian);
+        i += 2;
+        view.setInt16(i, 32767, littleEndian);
+        i += 2;
+        view.setUint32(i, 4294967295, littleEndian);
+        i += 4;
+        view.setInt32(i, 2147483647, littleEndian);
+        i += 4;
+        view.setFloat32(i, 1.625, littleEndian);
+        i += 4;
+        view.setFloat64(i, Math.E, littleEndian);
+        i += 8;
+    }
+}
+
+function loadTestDataFromView(view, littleEndian) {
+    var byteLength = view.byteLength;
+    var result = [];
+    for (var i = 0; i < byteLength;) {
+        result.push(view.getUint8(i, littleEndian));
+        i += 1;
+        result.push(view.getInt8(i, littleEndian));
+        i += 1;
+        result.push(view.getUint16(i, littleEndian));
+        i += 2;
+        result.push(view.getInt16(i, littleEndian));
+        i += 2;
+        result.push(view.getUint32(i, littleEndian));
+        i += 4;
+        result.push(view.getInt32(i, littleEndian));
+        i += 4;
+        result.push(view.getFloat32(i, littleEndian));
+        i += 4;
+        result.push(view.getFloat64(i, littleEndian));
+        i += 8;
+    }
+    return result;
+}
+
+function testWrite(fast, littleEndian) {
+    var buffer = new ArrayBuffer(bufferSize);
     var DataViewClass = fast ? FastDataView : DataView;
     var name = fast ? 'FastDataView' : 'DataView';
 
     var view = new DataViewClass(buffer);
     console.time(name + ' wirte');
     for (var c = 0; c < testCount; c++) {
-        for (var i = 0; i < byteLength;) {
-            view.setUint8(i, 255);
-            i += 1;
-            view.setInt8(i, 127);
-            i += 1;
-            view.setUint16(i, 65535);
-            i += 2;
-            view.setInt16(i, 32767);
-            i += 2;
-            view.setUint32(i, 4294967295);
-            i += 4;
-            view.setInt32(i, 2147483647);
-            i += 4;
-            view.setFloat32(i, 1.625);
-            i += 4;
-            view.setFloat64(i, Math.E);
-            i += 8;
-        }
+        saveTestDataToView(view, littleEndian);
     }
     console.timeEnd(name + ' wirte');
     return buffer;
 }
 
-function testRead(buffer, fast) {
+function testRead(buffer, fast, littleEndian) {
     var byteLength = buffer.byteLength;
     var DataViewClass = fast ? FastDataView : DataView;
     var name = fast ? 'FastDataView' : 'DataView';
@@ -43,109 +93,146 @@ function testRead(buffer, fast) {
     var view = new DataViewClass(buffer);
     console.time(name + ' read');
     for (var c = 0; c < testCount; c++) {
-        for (var i = 0; i < byteLength;) {
-            view.getUint8(i);
-            i += 1;
-            view.getInt8(i);
-            i += 1;
-            view.getUint16(i);
-            i += 2;
-            view.getInt16(i);
-            i += 2;
-            view.getUint32(i);
-            i += 4;
-            view.getInt32(i);
-            i += 4;
-            view.getFloat32(i);
-            i += 4;
-            view.getFloat64(i);
-            i += 8;
-        }
+        loadTestDataFromView(view, littleEndian);
     }
     console.timeEnd(name + ' read');
     return buffer;
 }
 
-function verify(buffer1, buffer2) {
-    // var byteLength = buffer1.byteLength;
+
+function verify(littleEndian) {
     var byteLength = 26;
 
-    var bytes1 = new Uint8Array(buffer1);
-    var bytes2 = new Uint8Array(buffer2);
+    var buffer1 = new ArrayBuffer(byteLength);
+    var view1 = new DataView(buffer1);
 
+    var buffer2 = new ArrayBuffer(byteLength);
+    var view2 = new FastDataView(buffer2);
+
+    saveTestDataToView(view1, littleEndian);
+    saveTestDataToView(view2, littleEndian);
+
+    // var byteLength = buffer1.byteLength;
+
+    var byteArray1 = new Uint8Array(buffer1);
+    var byteArray2 = new Uint8Array(buffer2);
+
+    var ok = true;
     for (var i = 0; i < byteLength; i++) {
-        if (bytes1[i] !== bytes2[i]) {
-            console.log("wirte FAILED", i);
-            return;
+        if (byteArray1[i] !== byteArray2[i]) {
+            ok = false;
+            console.log("wirte FAILED ( " + i + " ) : ", byteArray1[i], byteArray2[i]);
         }
     }
-    console.log("==== wirte OK. ====");
+
+    if (ok) {
+        console.log("  >>> wirte OK <<<");
+    }
 
     var view1 = new FastDataView(buffer1);
     var view2 = new DataView(buffer1);
 
-    for (var i = 0; i < byteLength;) {
-        if (view1.getUint8(i) !== view2.getUint8(i)) {
-            console.log("read FAILED ", i);
-            return;
-        };
-        console.log(view1.getUint8(i));
-        i += 1;
-        if (view1.getInt8(i) !== view2.getInt8(i)) {
-            console.log("read FAILED ", i);
-            return;
-        };
-        console.log(view1.getInt8(i));
-        i += 1;
-        if (view1.getUint16(i) !== view2.getUint16(i)) {
-            console.log("read FAILED ", i);
-            return;
-        };
-        console.log(view1.getUint16(i));
-        i += 2;
-        if (view1.getInt16(i) !== view2.getInt16(i)) {
-            console.log("read FAILED ", i);
-            return;
-        };
-        console.log(view1.getInt16(i));
-        i += 2;
-        if (view1.getUint32(i) !== view2.getUint32(i)) {
-            console.log("read FAILED ", i);
-            return;
-        };
-        console.log(view1.getUint32(i));
-        i += 4;
-        if (view1.getInt32(i) !== view2.getInt32(i)) {
-            console.log("read FAILED ", i);
-            return;
-        };
-        console.log(view1.getInt32(i));
-        i += 4;
-        if (view1.getFloat32(i) !== view2.getFloat32(i)) {
-            console.log("read FAILED ", i);
-            return;
-        };
-        console.log(view1.getFloat32(i));
-        i += 4;
-        if (view1.getFloat64(i) !== view2.getFloat64(i)) {
-            console.log("read FAILED ", i);
-            return;
-        };
-        console.log(view1.getFloat64(i));
-        i += 8;
+    var result1 = loadTestDataFromView(view1, littleEndian);
+    var result2 = loadTestDataFromView(view2, littleEndian);
+
+    var ok = true;
+    result1.forEach(function(num1, idx) {
+        var num2 = result2[idx];
+        var type = types[idx];
+        if (num1 !== num2) {
+            ok = false;
+            console.log('read FAILED ( ' + type + ' ) : ', num1, num2);
+        } else {
+            console.log('read ( ' + type + ' ) : ', num1);
+        }
+    });
+    if (ok) {
+        console.log("  >>> read OK <<<");
     }
-
-    console.log("==== read OK. ====");
-
+    // var view2 = new FastDataView(buffer);
 }
 
+function verifyTypedArray(littleEndian) {
+    var testValue = [
+        1, 15, 16, 255, 256, 65535, 65536, 0xABCDABCD
+    ];
+    var typedMethod = [
+        'setUint8',
+        'setInt8',
+        'setUint16',
+        'setInt16',
+        'setUint32',
+        'setInt32',
+        'setFloat32',
+        'setFloat64',
+    ];
+
+    var cacheBuffer = new ArrayBuffer(8);
+    var byteArray = new Uint8Array(cacheBuffer);
+    var TypedArrays = {
+        uint8Array: new Uint8Array(cacheBuffer),
+        int8Array: new Int8Array(cacheBuffer),
+        uint16Array: new Uint16Array(cacheBuffer),
+        int16Array: new Int16Array(cacheBuffer),
+        uint32Array: new Uint32Array(cacheBuffer),
+        int32Array: new Int32Array(cacheBuffer),
+        float32Array: new Float32Array(cacheBuffer),
+        float64Array: new Float64Array(cacheBuffer),
+    }
+
+    var result = [
+        [],
+        []
+    ];
+    var views = [
+        new DataView(cacheBuffer),
+        new FastDataView(cacheBuffer),
+    ];
+    views.forEach(function(view, idx) {
+        testValue.forEach(function(value) {
+            byteArray.fill(0);
+            typedMethod.forEach(function(method) {
+                view[method](0, value, littleEndian);
+                for (var name in TypedArrays) {
+                    var array = TypedArrays[name];
+                    result[idx].push([array[0], method, name, value])
+                }
+            });
+        });
+    });
+    var result1 = result[0];
+    var result2 = result[0];
+
+    var ok = true;
+    result1.forEach(function(r1, idx) {
+        var num1 = r1[0];
+        var method = r1[1];
+        var name = r1[2];
+        var value = r1[3];
+
+        var r2 = result2[idx];
+        var num2 = r2[0];
+
+        if (num1 !== num2 && !isNaN(num1) && !isNaN(num2)) {
+            ok = false;
+            console.log('TypedArray FAILED (', method, name, value, ') : ', num1, num2);
+        }
+    });
+    if (ok) {
+        console.log("  >>> TypedArray OK <<<");
+    }
+}
 
 console.log("==== performance (x" + testCount + ") ====");
 
-var buffer1 = testWrite(bufferSize, true);
-testRead(buffer1, true);
+var bufferFast = testWrite(true, littleEndian);
+testRead(bufferFast, true, littleEndian);
 
-var buffer2 = testWrite(bufferSize);
-testRead(buffer2);
+var buffer = testWrite(false, littleEndian);
+testRead(buffer, false, littleEndian);
 
-verify(buffer1, buffer2);
+console.log("==== verify ====");
+verify(littleEndian);
+
+console.log("==== verify TypedArray ====");
+verifyTypedArray(littleEndian)

@@ -21,5 +21,4 @@ Then user could use `dataview` as same as normal DataView object.
 ### Known Issue
 
 * It doesn't check the length of buffer in the data getter/setter.
-* Only support big endian.
 

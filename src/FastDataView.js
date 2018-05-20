@@ -39,12 +39,11 @@ var FastDataView;
     };
 
     FastDataView.prototype.setBuffer = function(buffer, byteOffset, byteLength) {
-        this.buffer = buffer;
-
         // If buffer is an instance of Node Buffer , byteArray = buffer;
-        var isByteArray = buffer instanceof Uint8Array || buffer.buffer;
+        var isByteArray = (buffer instanceof Uint8Array) || buffer.buffer;
 
         this.byteArray = isByteArray ? buffer : new Uint8Array(buffer);
+        this.buffer = this.byteArray.buffer;
 
         this.setRange(byteOffset, byteLength);
     };
@@ -75,6 +74,12 @@ var FastDataView;
         this.cursor = Math.min(this.byteEnd, this.cursor + count);
     };
 
+    ///////////////////////////////////
+    //
+    // Uint8
+    //
+    ///////////////////////////////////
+
     FastDataView.prototype.setUint8 = function(offset, value) {
         this.byteArray[offset + this.byteOffset] = value;
     };
@@ -90,6 +95,12 @@ var FastDataView;
     FastDataView.prototype.nextUint8 = function() {
         return this.byteArray[this.byteOffset + this.cursor++];
     };
+
+    ///////////////////////////////////
+    //
+    // Int8
+    //
+    ///////////////////////////////////
 
     FastDataView.prototype.setInt8 = function(offset, value) {
         this.byteArray[offset + this.byteOffset] = value;
@@ -111,235 +122,443 @@ var FastDataView;
         return this.int8Array[0];
     };
 
-    FastDataView.prototype.setUint16 = function(offset, value) {
+    ///////////////////////////////////
+    //
+    // Uint16
+    //
+    ///////////////////////////////////
+
+    FastDataView.prototype.setUint16 = function(offset, value, littleEndian) {
         offset += this.byteOffset;
-        this.byteArray[offset + 0] = value;
-        this.byteArray[offset + 1] = value >>> 8;
+        if (littleEndian) {
+            this.byteArray[offset + 0] = value;
+            this.byteArray[offset + 1] = value >>> 8;
+        } else {
+            this.byteArray[offset + 0] = value >>> 8;
+            this.byteArray[offset + 1] = value;
+        }
     };
 
-    FastDataView.prototype.getUint16 = function(offset) {
+    FastDataView.prototype.getUint16 = function(offset, littleEndian) {
         offset += this.byteOffset;
-        var a = this.byteArray[offset + 0];
-        var b = this.byteArray[offset + 1];
-        return a | (b << 8);
+        var a, b;
+        if (littleEndian) {
+            a = this.byteArray[offset + 0];
+            b = this.byteArray[offset + 1];
+        } else {
+            a = this.byteArray[offset + 1];
+            b = this.byteArray[offset + 0];
+        }
+        return (b << 8) | a;
     };
 
-    FastDataView.prototype.pushUint16 = function(value) {
+    FastDataView.prototype.pushUint16 = function(value, littleEndian) {
         var offset = this.byteOffset + this.cursor;
-        this.byteArray[offset + 0] = value;
-        this.byteArray[offset + 1] = value >>> 8;
+        if (littleEndian) {
+            this.byteArray[offset + 0] = value;
+            this.byteArray[offset + 1] = value >>> 8;
+        } else {
+            this.byteArray[offset + 0] = value >>> 8;
+            this.byteArray[offset + 1] = value;
+        }
         this.cursor += 2;
     };
 
-    FastDataView.prototype.nextUint16 = function() {
+    FastDataView.prototype.nextUint16 = function(littleEndian) {
         var offset = this.byteOffset + this.cursor;
-        var a = this.byteArray[offset + 0];
-        var b = this.byteArray[offset + 1];
+        var a, b;
+        if (littleEndian) {
+            a = this.byteArray[offset + 0];
+            b = this.byteArray[offset + 1];
+        } else {
+            a = this.byteArray[offset + 1];
+            b = this.byteArray[offset + 0];
+        }
         this.cursor += 2;
-        return a | (b << 8);
+        return (b << 8) | a;
     };
 
-    FastDataView.prototype.setInt16 = function(offset, value) {
+    ///////////////////////////////////
+    //
+    // Int16
+    //
+    ///////////////////////////////////
+
+    FastDataView.prototype.setInt16 = function(offset, value, littleEndian) {
         offset += this.byteOffset;
-        this.byteArray[offset + 0] = value >>> 8;
-        this.byteArray[offset + 1] = value;
+        if (littleEndian) {
+            this.byteArray[offset + 0] = value;
+            this.byteArray[offset + 1] = value >>> 8;
+        } else {
+            this.byteArray[offset + 0] = value >>> 8;
+            this.byteArray[offset + 1] = value;
+        }
     };
 
-    FastDataView.prototype.getInt16 = function(offset) {
+    FastDataView.prototype.getInt16 = function(offset, littleEndian) {
         // Use TypedArray
         offset += this.byteOffset;
-        this.uint8Array[0] = this.byteArray[offset + 1];
-        this.uint8Array[1] = this.byteArray[offset + 0];
+        if (littleEndian) {
+            this.uint8Array[0] = this.byteArray[offset + 0];
+            this.uint8Array[1] = this.byteArray[offset + 1];
+        } else {
+            this.uint8Array[0] = this.byteArray[offset + 1];
+            this.uint8Array[1] = this.byteArray[offset + 0];
+        }
         return this.int16Array[0];
     };
 
-    FastDataView.prototype.pushInt16 = function(value) {
+    FastDataView.prototype.pushInt16 = function(value, littleEndian) {
         var offset = this.byteOffset + this.cursor;
-        this.byteArray[offset + 0] = value >>> 8;
-        this.byteArray[offset + 1] = value;
+        if (littleEndian) {
+            this.byteArray[offset + 0] = value;
+            this.byteArray[offset + 1] = value >>> 8;
+        } else {
+            this.byteArray[offset + 0] = value >>> 8;
+            this.byteArray[offset + 1] = value;
+        }
         this.cursor += 2;
     };
 
-    FastDataView.prototype.nextInt16 = function() {
+    FastDataView.prototype.nextInt16 = function(littleEndian) {
         // Use TypedArray
         var offset = this.byteOffset + this.cursor;
-        this.uint8Array[0] = this.byteArray[offset + 1];
-        this.uint8Array[1] = this.byteArray[offset + 0];
+        if (littleEndian) {
+            this.uint8Array[0] = this.byteArray[offset + 0];
+            this.uint8Array[1] = this.byteArray[offset + 1];
+        } else {
+            this.uint8Array[0] = this.byteArray[offset + 1];
+            this.uint8Array[1] = this.byteArray[offset + 0];
+        }
         this.cursor += 2;
         return this.int16Array[0];
     };
 
-    FastDataView.prototype.setUint32 = function(offset, value) {
+    ///////////////////////////////////
+    //
+    // Uint32
+    //
+    ///////////////////////////////////
+
+    FastDataView.prototype.setUint32 = function(offset, value, littleEndian) {
         offset += this.byteOffset;
-        this.byteArray[offset + 0] = value;
-        this.byteArray[offset + 1] = value >>> 8;
-        this.byteArray[offset + 2] = value >>> 16;
-        this.byteArray[offset + 3] = value >>> 24;
+        if (littleEndian) {
+            this.byteArray[offset + 0] = value;
+            this.byteArray[offset + 1] = value >>> 8;
+            this.byteArray[offset + 2] = value >>> 16;
+            this.byteArray[offset + 3] = value >>> 24;
+        } else {
+            this.byteArray[offset + 0] = value >>> 24;
+            this.byteArray[offset + 1] = value >>> 16;
+            this.byteArray[offset + 2] = value >>> 8;
+            this.byteArray[offset + 3] = value;
+        }
     };
 
-    FastDataView.prototype.getUint32 = function(offset) {
+    FastDataView.prototype.getUint32 = function(offset, littleEndian) {
         offset += this.byteOffset;
-        var a = this.byteArray[offset + 0];
-        var b = this.byteArray[offset + 1];
-        var c = this.byteArray[offset + 2];
-        var d = this.byteArray[offset + 3];
-        return (a | (b << 8) | (c << 16)) + ((d << 24) >>> 0);
+        var a, b, c, d;
+        if (littleEndian) {
+            a = this.byteArray[offset + 0];
+            b = this.byteArray[offset + 1];
+            c = this.byteArray[offset + 2];
+            d = this.byteArray[offset + 3];
+        } else {
+            a = this.byteArray[offset + 3];
+            b = this.byteArray[offset + 2];
+            c = this.byteArray[offset + 1];
+            d = this.byteArray[offset + 0];
+        }
+        return ((d << 24) >>> 0) + ((c << 16) | (b << 8) | a);
     };
 
-    FastDataView.prototype.pushUint32 = function(value) {
+    FastDataView.prototype.pushUint32 = function(value, littleEndian) {
         var offset = this.byteOffset + this.cursor;
-        this.byteArray[offset + 0] = value;
-        this.byteArray[offset + 1] = value >>> 8;
-        this.byteArray[offset + 2] = value >>> 16;
-        this.byteArray[offset + 3] = value >>> 24;
+        if (littleEndian) {
+            this.byteArray[offset + 0] = value;
+            this.byteArray[offset + 1] = value >>> 8;
+            this.byteArray[offset + 2] = value >>> 16;
+            this.byteArray[offset + 3] = value >>> 24;
+        } else {
+            this.byteArray[offset + 0] = value >>> 24;
+            this.byteArray[offset + 1] = value >>> 16;
+            this.byteArray[offset + 2] = value >>> 8;
+            this.byteArray[offset + 3] = value;
+        }
         this.cursor += 4;
     };
 
-    FastDataView.prototype.nextUint32 = function() {
+    FastDataView.prototype.nextUint32 = function(littleEndian) {
         var offset = this.byteOffset + this.cursor;
-        var a = this.byteArray[offset + 0];
-        var b = this.byteArray[offset + 1];
-        var c = this.byteArray[offset + 2];
-        var d = this.byteArray[offset + 3];
+        var a, b, c, d;
+        if (littleEndian) {
+            a = this.byteArray[offset + 0];
+            b = this.byteArray[offset + 1];
+            c = this.byteArray[offset + 2];
+            d = this.byteArray[offset + 3];
+        } else {
+            a = this.byteArray[offset + 3];
+            b = this.byteArray[offset + 2];
+            c = this.byteArray[offset + 1];
+            d = this.byteArray[offset + 0];
+        }
         this.cursor += 4;
-        return (a | (b << 8) | (c << 16)) + ((d << 24) >>> 0);
+        return ((d << 24) >>> 0) + ((c << 16) | (b << 8) | a);
     };
 
-    FastDataView.prototype.setInt32 = function(offset, value) {
+    ///////////////////////////////////
+    //
+    // Int32
+    //
+    ///////////////////////////////////
+
+    FastDataView.prototype.setInt32 = function(offset, value, littleEndian) {
         offset += this.byteOffset;
-        this.byteArray[offset + 0] = value >>> 24;
-        this.byteArray[offset + 1] = value >>> 16;
-        this.byteArray[offset + 2] = value >>> 8;
-        this.byteArray[offset + 3] = value;
+        if (littleEndian) {
+            this.byteArray[offset + 0] = value;
+            this.byteArray[offset + 1] = value >>> 8;
+            this.byteArray[offset + 2] = value >>> 16;
+            this.byteArray[offset + 3] = value >>> 24;
+        } else {
+            this.byteArray[offset + 0] = value >>> 24;
+            this.byteArray[offset + 1] = value >>> 16;
+            this.byteArray[offset + 2] = value >>> 8;
+            this.byteArray[offset + 3] = value;
+        }
     };
 
-    FastDataView.prototype.getInt32 = function(offset) {
+    FastDataView.prototype.getInt32 = function(offset, littleEndian) {
         // Use TypedArray
         offset += this.byteOffset;
-        this.uint8Array[0] = this.byteArray[offset + 3];
-        this.uint8Array[1] = this.byteArray[offset + 2];
-        this.uint8Array[2] = this.byteArray[offset + 1];
-        this.uint8Array[3] = this.byteArray[offset + 0];
+        if (littleEndian) {
+            this.uint8Array[0] = this.byteArray[offset + 0];
+            this.uint8Array[1] = this.byteArray[offset + 1];
+            this.uint8Array[2] = this.byteArray[offset + 2];
+            this.uint8Array[3] = this.byteArray[offset + 3];
+        } else {
+            this.uint8Array[0] = this.byteArray[offset + 3];
+            this.uint8Array[1] = this.byteArray[offset + 2];
+            this.uint8Array[2] = this.byteArray[offset + 1];
+            this.uint8Array[3] = this.byteArray[offset + 0];
+        }
         return this.int32Array[0];
     };
 
-    FastDataView.prototype.pushInt32 = function(value) {
+    FastDataView.prototype.pushInt32 = function(value, littleEndian) {
         var offset = this.byteOffset + this.cursor;
-        this.byteArray[offset + 0] = value >>> 24;
-        this.byteArray[offset + 1] = value >>> 16;
-        this.byteArray[offset + 2] = value >>> 8;
-        this.byteArray[offset + 3] = value;
+        if (littleEndian) {
+            this.byteArray[offset + 0] = value;
+            this.byteArray[offset + 1] = value >>> 8;
+            this.byteArray[offset + 2] = value >>> 16;
+            this.byteArray[offset + 3] = value >>> 24;
+        } else {
+            this.byteArray[offset + 0] = value >>> 24;
+            this.byteArray[offset + 1] = value >>> 16;
+            this.byteArray[offset + 2] = value >>> 8;
+            this.byteArray[offset + 3] = value;
+        }
         this.cursor += 4;
     };
 
-    FastDataView.prototype.nextInt32 = function() {
+    FastDataView.prototype.nextInt32 = function(littleEndian) {
         // Use TypedArray
         var offset = this.byteOffset + this.cursor;
-        this.uint8Array[0] = this.byteArray[offset + 3];
-        this.uint8Array[1] = this.byteArray[offset + 2];
-        this.uint8Array[2] = this.byteArray[offset + 1];
-        this.uint8Array[3] = this.byteArray[offset + 0];
+        if (littleEndian) {
+            this.uint8Array[0] = this.byteArray[offset + 0];
+            this.uint8Array[1] = this.byteArray[offset + 1];
+            this.uint8Array[2] = this.byteArray[offset + 2];
+            this.uint8Array[3] = this.byteArray[offset + 3];
+        } else {
+            this.uint8Array[0] = this.byteArray[offset + 3];
+            this.uint8Array[1] = this.byteArray[offset + 2];
+            this.uint8Array[2] = this.byteArray[offset + 1];
+            this.uint8Array[3] = this.byteArray[offset + 0];
+        }
         this.cursor += 4;
         return this.int32Array[0];
     };
 
-    FastDataView.prototype.setFloat32 = function(offset, value) {
+    ///////////////////////////////////
+    //
+    // Float32
+    //
+    ///////////////////////////////////
+
+    FastDataView.prototype.setFloat32 = function(offset, value, littleEndian) {
         offset += this.byteOffset;
         this.float32Array[0] = value;
-        this.byteArray[offset + 0] = this.uint8Array[3];
-        this.byteArray[offset + 1] = this.uint8Array[2];
-        this.byteArray[offset + 2] = this.uint8Array[1];
-        this.byteArray[offset + 3] = this.uint8Array[0];
+        if (littleEndian) {
+            this.byteArray[offset + 0] = this.uint8Array[0];
+            this.byteArray[offset + 1] = this.uint8Array[1];
+            this.byteArray[offset + 2] = this.uint8Array[2];
+            this.byteArray[offset + 3] = this.uint8Array[3];
+        } else {
+            this.byteArray[offset + 0] = this.uint8Array[3];
+            this.byteArray[offset + 1] = this.uint8Array[2];
+            this.byteArray[offset + 2] = this.uint8Array[1];
+            this.byteArray[offset + 3] = this.uint8Array[0];
+        }
     };
 
-    FastDataView.prototype.getFloat32 = function(offset) {
+    FastDataView.prototype.getFloat32 = function(offset, littleEndian) {
         // Use TypedArray
         offset += this.byteOffset;
-        this.uint8Array[0] = this.byteArray[offset + 3];
-        this.uint8Array[1] = this.byteArray[offset + 2];
-        this.uint8Array[2] = this.byteArray[offset + 1];
-        this.uint8Array[3] = this.byteArray[offset + 0];
+        if (littleEndian) {
+            this.uint8Array[0] = this.byteArray[offset + 0];
+            this.uint8Array[1] = this.byteArray[offset + 1];
+            this.uint8Array[2] = this.byteArray[offset + 2];
+            this.uint8Array[3] = this.byteArray[offset + 3];
+        } else {
+            this.uint8Array[0] = this.byteArray[offset + 3];
+            this.uint8Array[1] = this.byteArray[offset + 2];
+            this.uint8Array[2] = this.byteArray[offset + 1];
+            this.uint8Array[3] = this.byteArray[offset + 0];
+        }
         return this.float32Array[0];
     };
 
-    FastDataView.prototype.pushFloat32 = function(value) {
+    FastDataView.prototype.pushFloat32 = function(value, littleEndian) {
         var offset = this.byteOffset + this.cursor;
         this.float32Array[0] = value;
-        this.byteArray[offset + 0] = this.uint8Array[3];
-        this.byteArray[offset + 1] = this.uint8Array[2];
-        this.byteArray[offset + 2] = this.uint8Array[1];
-        this.byteArray[offset + 3] = this.uint8Array[0];
+        if (littleEndian) {
+            this.byteArray[offset + 0] = this.uint8Array[0];
+            this.byteArray[offset + 1] = this.uint8Array[1];
+            this.byteArray[offset + 2] = this.uint8Array[2];
+            this.byteArray[offset + 3] = this.uint8Array[3];
+        } else {
+            this.byteArray[offset + 0] = this.uint8Array[3];
+            this.byteArray[offset + 1] = this.uint8Array[2];
+            this.byteArray[offset + 2] = this.uint8Array[1];
+            this.byteArray[offset + 3] = this.uint8Array[0];
+        }
         this.cursor += 4;
     };
 
-    FastDataView.prototype.nextFloat32 = function() {
+    FastDataView.prototype.nextFloat32 = function(littleEndian) {
         // Use TypedArray
         var offset = this.byteOffset + this.cursor;
-        this.uint8Array[0] = this.byteArray[offset + 3];
-        this.uint8Array[1] = this.byteArray[offset + 2];
-        this.uint8Array[2] = this.byteArray[offset + 1];
-        this.uint8Array[3] = this.byteArray[offset + 0];
+        if (littleEndian) {
+            this.uint8Array[0] = this.byteArray[offset + 0];
+            this.uint8Array[1] = this.byteArray[offset + 1];
+            this.uint8Array[2] = this.byteArray[offset + 2];
+            this.uint8Array[3] = this.byteArray[offset + 3];
+        } else {
+            this.uint8Array[0] = this.byteArray[offset + 3];
+            this.uint8Array[1] = this.byteArray[offset + 2];
+            this.uint8Array[2] = this.byteArray[offset + 1];
+            this.uint8Array[3] = this.byteArray[offset + 0];
+        }
         this.cursor += 4;
         return this.float32Array[0];
     };
 
-    FastDataView.prototype.setFloat64 = function(offset, value) {
+    ///////////////////////////////////
+    //
+    // Float64
+    //
+    ///////////////////////////////////
+
+    FastDataView.prototype.setFloat64 = function(offset, value, littleEndian) {
         offset += this.byteOffset;
         this.float64Array[0] = value;
-        this.byteArray[offset + 0] = this.uint8Array[7];
-        this.byteArray[offset + 1] = this.uint8Array[6];
-        this.byteArray[offset + 2] = this.uint8Array[5];
-        this.byteArray[offset + 3] = this.uint8Array[4];
-        this.byteArray[offset + 4] = this.uint8Array[3];
-        this.byteArray[offset + 5] = this.uint8Array[2];
-        this.byteArray[offset + 6] = this.uint8Array[1];
-        this.byteArray[offset + 7] = this.uint8Array[0];
+        if (littleEndian) {
+            this.byteArray[offset + 0] = this.uint8Array[0];
+            this.byteArray[offset + 1] = this.uint8Array[1];
+            this.byteArray[offset + 2] = this.uint8Array[2];
+            this.byteArray[offset + 3] = this.uint8Array[3];
+            this.byteArray[offset + 4] = this.uint8Array[4];
+            this.byteArray[offset + 5] = this.uint8Array[5];
+            this.byteArray[offset + 6] = this.uint8Array[6];
+            this.byteArray[offset + 7] = this.uint8Array[7];
+        } else {
+            this.byteArray[offset + 0] = this.uint8Array[7];
+            this.byteArray[offset + 1] = this.uint8Array[6];
+            this.byteArray[offset + 2] = this.uint8Array[5];
+            this.byteArray[offset + 3] = this.uint8Array[4];
+            this.byteArray[offset + 4] = this.uint8Array[3];
+            this.byteArray[offset + 5] = this.uint8Array[2];
+            this.byteArray[offset + 6] = this.uint8Array[1];
+            this.byteArray[offset + 7] = this.uint8Array[0];
+        }
     };
 
-    FastDataView.prototype.getFloat64 = function(offset) {
+    FastDataView.prototype.getFloat64 = function(offset, littleEndian) {
         offset += this.byteOffset;
         // Use TypedArray
-        this.uint8Array[0] = this.byteArray[offset + 7];
-        this.uint8Array[1] = this.byteArray[offset + 6];
-        this.uint8Array[2] = this.byteArray[offset + 5];
-        this.uint8Array[3] = this.byteArray[offset + 4];
-        this.uint8Array[4] = this.byteArray[offset + 3];
-        this.uint8Array[5] = this.byteArray[offset + 2];
-        this.uint8Array[6] = this.byteArray[offset + 1];
-        this.uint8Array[7] = this.byteArray[offset + 0];
+        if (littleEndian) {
+            this.uint8Array[0] = this.byteArray[offset + 0];
+            this.uint8Array[1] = this.byteArray[offset + 1];
+            this.uint8Array[2] = this.byteArray[offset + 2];
+            this.uint8Array[3] = this.byteArray[offset + 3];
+            this.uint8Array[4] = this.byteArray[offset + 4];
+            this.uint8Array[5] = this.byteArray[offset + 5];
+            this.uint8Array[6] = this.byteArray[offset + 6];
+            this.uint8Array[7] = this.byteArray[offset + 7];
+        } else {
+            this.uint8Array[0] = this.byteArray[offset + 7];
+            this.uint8Array[1] = this.byteArray[offset + 6];
+            this.uint8Array[2] = this.byteArray[offset + 5];
+            this.uint8Array[3] = this.byteArray[offset + 4];
+            this.uint8Array[4] = this.byteArray[offset + 3];
+            this.uint8Array[5] = this.byteArray[offset + 2];
+            this.uint8Array[6] = this.byteArray[offset + 1];
+            this.uint8Array[7] = this.byteArray[offset + 0];
+        }
         return this.float64Array[0];
     };
 
-    FastDataView.prototype.pushFloat64 = function(value) {
+    FastDataView.prototype.pushFloat64 = function(value, littleEndian) {
         var offset = this.byteOffset + this.cursor;
         this.float64Array[0] = value;
-        this.byteArray[offset + 0] = this.uint8Array[7];
-        this.byteArray[offset + 1] = this.uint8Array[6];
-        this.byteArray[offset + 2] = this.uint8Array[5];
-        this.byteArray[offset + 3] = this.uint8Array[4];
-        this.byteArray[offset + 4] = this.uint8Array[3];
-        this.byteArray[offset + 5] = this.uint8Array[2];
-        this.byteArray[offset + 6] = this.uint8Array[1];
-        this.byteArray[offset + 7] = this.uint8Array[0];
+        if (littleEndian) {
+            this.byteArray[offset + 0] = this.uint8Array[0];
+            this.byteArray[offset + 1] = this.uint8Array[1];
+            this.byteArray[offset + 2] = this.uint8Array[2];
+            this.byteArray[offset + 3] = this.uint8Array[3];
+            this.byteArray[offset + 4] = this.uint8Array[4];
+            this.byteArray[offset + 5] = this.uint8Array[5];
+            this.byteArray[offset + 6] = this.uint8Array[6];
+            this.byteArray[offset + 7] = this.uint8Array[7];
+        } else {
+            this.byteArray[offset + 0] = this.uint8Array[7];
+            this.byteArray[offset + 1] = this.uint8Array[6];
+            this.byteArray[offset + 2] = this.uint8Array[5];
+            this.byteArray[offset + 3] = this.uint8Array[4];
+            this.byteArray[offset + 4] = this.uint8Array[3];
+            this.byteArray[offset + 5] = this.uint8Array[2];
+            this.byteArray[offset + 6] = this.uint8Array[1];
+            this.byteArray[offset + 7] = this.uint8Array[0];
+        }
         this.cursor += 8;
     };
 
-    FastDataView.prototype.nextFloat64 = function() {
+    FastDataView.prototype.nextFloat64 = function(littleEndian) {
         // Use TypedArray
         var offset = this.byteOffset + this.cursor;
-        this.uint8Array[0] = this.byteArray[offset + 7];
-        this.uint8Array[1] = this.byteArray[offset + 6];
-        this.uint8Array[2] = this.byteArray[offset + 5];
-        this.uint8Array[3] = this.byteArray[offset + 4];
-        this.uint8Array[4] = this.byteArray[offset + 3];
-        this.uint8Array[5] = this.byteArray[offset + 2];
-        this.uint8Array[6] = this.byteArray[offset + 1];
-        this.uint8Array[7] = this.byteArray[offset + 0];
+        if (littleEndian) {
+            this.uint8Array[0] = this.byteArray[offset + 0];
+            this.uint8Array[1] = this.byteArray[offset + 1];
+            this.uint8Array[2] = this.byteArray[offset + 2];
+            this.uint8Array[3] = this.byteArray[offset + 3];
+            this.uint8Array[4] = this.byteArray[offset + 4];
+            this.uint8Array[5] = this.byteArray[offset + 5];
+            this.uint8Array[6] = this.byteArray[offset + 6];
+            this.uint8Array[7] = this.byteArray[offset + 7];
+        } else {
+            this.uint8Array[0] = this.byteArray[offset + 7];
+            this.uint8Array[1] = this.byteArray[offset + 6];
+            this.uint8Array[2] = this.byteArray[offset + 5];
+            this.uint8Array[3] = this.byteArray[offset + 4];
+            this.uint8Array[4] = this.byteArray[offset + 3];
+            this.uint8Array[5] = this.byteArray[offset + 2];
+            this.uint8Array[6] = this.byteArray[offset + 1];
+            this.uint8Array[7] = this.byteArray[offset + 0];
+        }
         this.cursor += 8;
         return this.float64Array[0];
     };
 
-    FastDataView.version = '0.2.0';
+    FastDataView.version = '0.3.1';
 
     if (exports) {
         exports.FastDataView = FastDataView;
