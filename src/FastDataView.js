@@ -27,6 +27,12 @@ var FastDataView;
         }
     };
 
+    ///////////////////////////////////
+    //
+    // Extra Methods
+    //
+    ///////////////////////////////////
+
     FastDataView.prototype.initCacheArray = function() {
         this.uint8Array = uint8Array;
         this.int8Array = int8Array;
