@@ -2,7 +2,8 @@ var FastDataView = FastDataView || require("../src/FastDataView");
 
 var testCount = 1000;
 
-var bufferSize = 26 * 1024;
+var bufferSize = 26;
+var KB = 1024;
 
 var littleEndian = false;
 
@@ -72,7 +73,7 @@ function loadTestDataFromView(view, littleEndian) {
 }
 
 function testWrite(fast, littleEndian) {
-    var buffer = new ArrayBuffer(bufferSize);
+    var buffer = new ArrayBuffer(bufferSize * KB);
     var DataViewClass = fast ? FastDataView : DataView;
     var name = fast ? 'FastDataView' : 'DataView';
 
@@ -101,7 +102,7 @@ function testRead(buffer, fast, littleEndian) {
 
 
 function verify(littleEndian) {
-    var byteLength = 26;
+    var byteLength = bufferSize;
 
     var buffer1 = new ArrayBuffer(byteLength);
     var view1 = new DataView(buffer1);
@@ -224,7 +225,7 @@ function verifyTypedArray(littleEndian) {
 }
 
 setTimeout(function() {
-    console.log("==== performance (x" + testCount + ") ====");
+    console.log("==== performance (", bufferSize + 'KB * ' + testCount + ") ====");
 
     var bufferFast = testWrite(true, littleEndian);
     testRead(bufferFast, true, littleEndian);
@@ -235,13 +236,14 @@ setTimeout(function() {
 
         setTimeout(function() {
 
-            console.log("==== verify ====");
+            console.log("==== verify with DataView ====");
             verify(littleEndian);
 
-            console.log("==== verify TypedArray ====");
+            console.log("==== verify with TypedArray ====");
             verifyTypedArray(littleEndian)
 
         }, 100);
+
     }, 100);
 
 }, 100)
