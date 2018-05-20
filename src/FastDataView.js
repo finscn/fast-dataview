@@ -40,8 +40,11 @@ var FastDataView;
 
     FastDataView.prototype.setBuffer = function(buffer, byteOffset, byteLength) {
         this.buffer = buffer;
+
         // If buffer is an instance of Node Buffer , byteArray = buffer;
-        this.byteArray = buffer.buffer ? buffer : new Uint8Array(buffer);
+        var isByteArray = buffer instanceof Uint8Array || buffer.buffer;
+
+        this.byteArray = isByteArray ? buffer : new Uint8Array(buffer);
 
         this.setRange(byteOffset, byteLength);
     };
@@ -333,7 +336,7 @@ var FastDataView;
         return this.float64Array[0];
     };
 
-    FastDataView.version = '0.1.8';
+    FastDataView.version = '0.1.9';
 
     if (exports) {
         exports.FastDataView = FastDataView;
