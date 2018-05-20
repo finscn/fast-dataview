@@ -61,6 +61,9 @@ var FastDataView;
     };
 
     FastDataView.prototype.subarray = function(begin, end) {
+        if (!end) {
+            return this.byteArray.subarray(begin + this.byteOffset, this.byteEnd);
+        }
         return this.byteArray.subarray(begin + this.byteOffset, Math.min(this.byteEnd, end + this.byteOffset));
     };
 
@@ -336,7 +339,7 @@ var FastDataView;
         return this.float64Array[0];
     };
 
-    FastDataView.version = '0.1.9';
+    FastDataView.version = '0.2.0';
 
     if (exports) {
         exports.FastDataView = FastDataView;
