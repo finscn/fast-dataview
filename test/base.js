@@ -27,11 +27,10 @@ console.log(t.length)
 
 
 // Invalid DataView length undefined
-// Offset is outside the bounds of the DataView
 // new RangeError('Offset is outside the bounds of the DataView');
 
-var buffer = new ArrayBuffer(2);
-var uint8 = new Uint8Array(buffer);
-var view = new DataView(buffer,0,2);
+// var buffer = new ArrayBuffer(2);
+// var uint8 = new Uint8Array(buffer);
+// var view = new DataView(buffer,0,2);
 // view.setUint8(20, 0xABCD);
-console.log(view.getUint8(-2));
+// console.log(view.getUint8(1));
