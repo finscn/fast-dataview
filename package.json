@@ -1,6 +1,6 @@
 {
   "name": "fast-dataview",
-  "version": "0.3.1",
+  "version": "0.3.2",
   "description": "A fast DataView implementation in javascript, and could works with Node.js Buffers.",
   "main": "src/FastDataView.js",
   "scripts": {
@@ -10,7 +10,11 @@
     "type": "git",
     "url": "git+ssh://git@github.com/finscn/fast-dataview.git"
   },
-  "author": "finscn <finscn@gmail.com>",
+  "author": {
+    "name": "finscn",
+    "email": "finscn@gmail.com",
+    "url": "fatidol.com"
+  },
   "license": "MIT",
   "keywords": [
     "dataview",
@@ -19,11 +23,6 @@
     "node",
     "buffer"
   ],
-  "author": {
-    "name": "finscn",
-    "email": "finscn@gmail.com",
-    "url": "fatidol.com"
-  },
   "bugs": {
     "url": "https://github.com/finscn/fast-dataview/issues"
   },

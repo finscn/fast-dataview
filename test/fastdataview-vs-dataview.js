@@ -1,5 +1,11 @@
 var FastDataView = FastDataView || require("../src/FastDataView");
 
+// var nodeBufferView = require("./lib/node-bufferview.js");
+// var bufferDataview = require("./lib/buffer-dataview.js");
+// var DataView = nodeBufferView;
+// var DataView = bufferDataview;
+// var ArrayBuffer = Buffer;
+
 var testCount = 1000;
 
 var bufferSize = 26;
@@ -8,7 +14,8 @@ var KB = 1024;
 var littleEndian = false;
 
 var args = process.argv.slice(2);
-if (args[0] === 'little' || args[0] === 'l') {
+var arg = String(args[0]).toLowerCase();
+if (arg === 'little' || arg === 'le' || arg === 'l') {
     littleEndian = true;
     console.log('\n ALL TESTS USE : littleEndian \n');
 } else {
@@ -247,4 +254,3 @@ setTimeout(function() {
     }, 100);
 
 }, 100);
-

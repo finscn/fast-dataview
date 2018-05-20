@@ -27,6 +27,8 @@ var FastDataView;
         }
     };
 
+    FastDataView.version = '0.3.2';
+
     ///////////////////////////////////
     //
     // Extra Methods
@@ -56,10 +58,10 @@ var FastDataView;
 
     FastDataView.prototype.setRange = function(byteOffset, byteLength) {
         var bufferSize = this.buffer.byteLength;
-        this.byteOffset = Math.min(bufferSize, byteOffset || 0);
+        this.byteOffset = Math.min(bufferSize, byteOffset || 0) | 0;
 
         var maxLength = bufferSize - this.byteOffset;
-        this.byteLength = Math.min(maxLength, byteLength || maxLength);
+        this.byteLength = Math.min(maxLength, byteLength || maxLength) | 0;
 
         this.byteEnd = this.byteOffset + this.byteLength;
         this.cursor = 0;
@@ -563,8 +565,6 @@ var FastDataView;
         this.cursor += 8;
         return this.float64Array[0];
     };
-
-    FastDataView.version = '0.3.1';
 
     if (exports) {
         exports.FastDataView = FastDataView;
