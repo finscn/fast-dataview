@@ -27,7 +27,7 @@ var FastDataView;
         }
     };
 
-    FastDataView.version = '0.3.2';
+    FastDataView.version = '0.3.3';
 
     ///////////////////////////////////
     //
