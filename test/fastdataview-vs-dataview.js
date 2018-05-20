@@ -223,16 +223,25 @@ function verifyTypedArray(littleEndian) {
     }
 }
 
-console.log("==== performance (x" + testCount + ") ====");
+setTimeout(function() {
+    console.log("==== performance (x" + testCount + ") ====");
 
-var bufferFast = testWrite(true, littleEndian);
-testRead(bufferFast, true, littleEndian);
+    var bufferFast = testWrite(true, littleEndian);
+    testRead(bufferFast, true, littleEndian);
 
-var buffer = testWrite(false, littleEndian);
-testRead(buffer, false, littleEndian);
+    setTimeout(function() {
+        var buffer = testWrite(false, littleEndian);
+        testRead(buffer, false, littleEndian);
 
-console.log("==== verify ====");
-verify(littleEndian);
+        setTimeout(function() {
 
-console.log("==== verify TypedArray ====");
-verifyTypedArray(littleEndian)
+            console.log("==== verify ====");
+            verify(littleEndian);
+
+            console.log("==== verify TypedArray ====");
+            verifyTypedArray(littleEndian)
+
+        }, 100);
+    }, 100);
+
+}, 100)
